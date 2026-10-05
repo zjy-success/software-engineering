@@ -1,0 +1,5 @@
+openai>=1.0.0
+
+$env:OPENAI_API_KEY = "sk-ws-H.PRYDHMY.1y7Q.MEYCIQDyapbbx0NjYuY9KuI0WiJB5my2xEvVw1B5jISfoIL9IwIhAKIjXlwKfc9Srd-kb-rpoIP0-gU9GmND5AWUYHfxzxMG"
+$env:DASHSCOPE_API_BASE = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+$env:AGENT_MODEL = "qwen-plus"
