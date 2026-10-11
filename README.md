@@ -136,11 +136,9 @@ def process_order(items):
 ├── agent.py
 ├── read.md
 ├── README.md
-├── .venv/
-├── .venv-1/
-├── .idea/
-└── __pycache__/
-```
+├── design.md
+├── requirements.txt
+├── 演示视频.mp4
 
 ### 4.1 `agent.py`
 
@@ -152,7 +150,7 @@ def process_order(items):
 - Agent 主逻辑
 - 命令行交互入口
 
-### 4.2 `read.md`
+### 4.2 `design.md`
 
 详细说明文档，适合项目说明和开发者学习。
 
