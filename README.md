@@ -140,6 +140,8 @@ def process_order(items):
 ├── requirements.txt
 ├── 演示视频.mp4
 
+---
+
 ### 4.1 `agent.py`
 
 这是项目的核心文件，包含以下模块：
