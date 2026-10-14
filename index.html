@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework2 Agent WebUI</title>
+    <!-- mermaid CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --user-msg-bg: #2563eb;
+            --user-msg-text: #fff;
+            --agent-msg-bg: #f1f5f9;
+            --agent-msg-text: #1e293b;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --font-base: 15px;
+            --font-sm: 13px;
+            --font-lg: 18px;
+            --font-xl: 24px;
+        }
+        *{box-sizing: border-box;margin:0;padding:0;}
+        body{
+            background: var(--bg-page);
+            padding: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: var(--font-base);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        h1 {
+            font-size: var(--font-xl);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+        .container{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width:900px){
+            .container{grid-template-columns:1fr;}
+        }
+        .card{
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover{
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        h2{
+            font-size: var(--font-lg);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        h3{
+            font-size: 16px;
+            margin: 12px 0 8px;
+            font-weight: 600;
+        }
+        textarea{
+            width:100%;
+            border:1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding:12px;
+            font-size: var(--font-base);
+            background: #fff;
+            transition: border 0.2s;
+            resize: vertical;
+        }
+        textarea:focus{
+            outline: none;
+            border-color: var(--primary);
+        }
+        #chat-area{
+            height:440px;
+            overflow-y:auto;
+            border:1px solid var(--border-color);
+            padding:14px;
+            border-radius: var(--radius-md);
+            margin-bottom:12px;
+            background:#fcfdff;
+        }
+        /* 消息气泡，左右分开，更好看 */
+        .msg-user{
+            background: var(--user-msg-bg);
+            color: var(--user-msg-text);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            margin: 8px 0;
+            white-space: pre-wrap;
+            max-width: 90%;
+            margin-left: auto;
+        }
+        .msg-agent{
+            background: var(--agent-msg-bg);
+            color: var(--agent-msg-text);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            margin: 8px 0;
+            white-space: pre-wrap;
+            max-width: 90%;
+            margin-right: auto;
+        }
+        button{
+            padding:10px 16px;
+            border:none;
+            border-radius: var(--radius-md);
+            background:var(--primary);
+            color:white;
+            cursor:pointer;
+            margin:6px 4px 6px 0;
+            font-size: var(--font-base);
+            transition: background 0.2s;
+        }
+        button:hover{background:var(--primary-hover);}
+        button:disabled{background:#94a3b8;cursor:not-allowed;}
+        pre{
+            background:#0f172a;
+            color:#e2e8f0;
+            padding:12px;
+            border-radius: var(--radius-sm);
+            overflow-x:auto;
+            font-size: var(--font-sm);
+        }
+        code{
+            background:#e2e8f0;
+            padding:2px 5px;
+            border-radius: 4px;
+            font-size: var(--font-sm);
+        }
+        .mermaid{
+            background:#fff;
+            padding:16px;
+            border:1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin:10px 0;
+        }
+        #wf-output{
+            max-height:400px;
+            overflow:auto;
+            white-space:pre-wrap;
+            background:#f8fafc;
+            padding:12px;
+            border:1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-sm);
+        }
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin:18px 0;
+        }
+        p {
+            color: var(--text-muted);
+            margin-bottom:8px;
+        }
+    </style>
+</head>
+<body>
+<h1>🤖 Homework2 Agent 网页版 | Workflow文档生成系统</h1>
+<div class="container">
+    <!-- 左侧：聊天对话面板 -->
+    <div class="card">
+        <h2>对话交互面板</h2>
+        <div id="chat-area"></div>
+        <textarea id="chat-input" rows="3" placeholder="输入指令，例如 help、/exec print(1+2)、/visual"></textarea>
+        <br>
+        <button onclick="sendChat()">发送消息（Ctrl+Enter）</button>
+    </div>
+    <!-- 右侧：Workflow运行面板 -->
+    <div class="card">
+        <h2>Workflow运行面板</h2>
+        <p>粘贴待分析Python代码：</p>
+        <textarea id="wf-code" rows="12" placeholder="粘贴你的Python代码..."></textarea>
+        <br>
+        <button onclick="runWorkflow('base')">运行【基础Workflow】(代码→分析→文档)</button>
+        <button onclick="runWorkflow('adv')">运行【高级Workflow】(并行+循环)</button>
+        <hr>
+        <h3>Workflow输出结果</h3>
+        <div id="wf-output"></div>
+    </div>
+</div>
+<script>
+// 初始化mermaid
+mermaid.initialize({
+    startOnLoad: false,
+    theme: "default"
+});
+const chatArea = document.getElementById("chat-area");
+const chatInput = document.getElementById("chat-input");
+const wfCode = document.getElementById("wf-code");
+const wfOutput = document.getElementById("wf-output");
+/**
+ * 解析文本，提取 ```mermaid ``` 代码块渲染图形
+ */
+async function appendMsg(role, rawText){
+    const outerDiv = document.createElement("div");
+    outerDiv.className = role==="user" ? "msg-user" : "msg-agent";
+    // 正则匹配 ```mermaid ... ```
+    const mmdReg = /```mermaid([\s\S]*?)```/g;
+    let lastIdx = 0;
+    let match;
+    const fragment = document.createDocumentFragment();
+    while ((match = mmdReg.exec(rawText)) !== null) {
+        const plainBefore = rawText.slice(lastIdx, match.index);
+        if(plainBefore.trim()){
+            const txtNode = document.createElement("div");
+            txtNode.textContent = plainBefore;
+            fragment.appendChild(txtNode);
+        }
+        // mermaid要求class="mermaid"
+        const wrapDiv = document.createElement("div");
+        wrapDiv.className = "mermaid";
+        wrapDiv.textContent = match[1].trim();
+        fragment.appendChild(wrapDiv);
+        lastIdx = match.index + match[0].length;
+    }
+    if(lastIdx < rawText.length){
+        const restTxt = document.createElement("div");
+        restTxt.textContent = rawText.slice(lastIdx);
+        fragment.appendChild(restTxt);
+    }
+    outerDiv.appendChild(fragment);
+    chatArea.appendChild(outerDiv);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    // 渲染全部 .mermaid 元素
+    await mermaid.run({
+        querySelector: '.mermaid',
+        suppressErrors:true
+    });
+}
+async function sendChat(){
+    const text = chatInput.value.trim();
+    if(!text) return;
+    await appendMsg("user", text);
+    chatInput.value = "";
+    try{
+        // 重点！Content-Type 中间是英文短横杠 `-`
+        const res = await fetch("/api/chat",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({user_text:text})
+        });
+        if(!res.ok) throw new Error(`HTTP错误，状态码:${res.status}`);
+        const data = await res.json();
+        if(data.ok){
+            await appendMsg("agent", data.reply);
+        }else{
+            await appendMsg("agent","错误："+data.msg);
+        }
+    }catch(err){
+        await appendMsg("agent","前端捕获异常：" + err.message);
+    }
+}
+async function runWorkflow(mode){
+    const code = wfCode.value;
+    wfOutput.innerText = "正在执行Workflow，请稍候...";
+    try{
+        const resp = await fetch("/api/workflow_run",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({code_text:code, mode:mode})
+        })
+        const d = await resp.json();
+        if(!d.ok){
+            wfOutput.innerText = "执行失败："+d.error;
+            return;
+        }
+        let out = "";
+        if(d.error){
+            out += "【Workflow ERROR】"+d.error+"\n\n";
+        }
+        out += "==== Workflow 日志 ====\n"+d.log;
+        if(d.risk_scan){
+            out += "\n\n==== 风险扫描报告 ====\n"+d.risk_scan;
+        }
+        if(d.summary){
+            out += "\n\n==== 代码摘要(SummaryAgent输出) ====\n"+d.summary;
+        }
+        out += "\n\n==== 生成Markdown文档 ====\n"+d.document;
+        wfOutput.innerText = out;
+    }catch(err){
+        wfOutput.innerText = "请求异常：" + err.message;
+    }
+}
+// Ctrl+Enter发送
+chatInput.addEventListener("keydown",(e)=>{
+    if(e.ctrlKey && e.key === "Enter") sendChat();
+})
+</script>
+</body>
+</html>
