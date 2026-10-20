@@ -18,7 +18,9 @@
 ├── index.html        # [前端] 用户交互界面，包含 HTML/CSS/JS
 ├── design.md         # [文档] 详细的设计文档，包含架构图、类图及设计思路
 ├── requirements.txt  # [配置] Python 依赖包列表
-└── README.md         # [文档] 本说明文件
+├── README.md         # [文档] 本说明文件
+├── README.md         # [文档] 本说明文件
+└── 演示视频.mp4
 ```
 
 ## 快速开始
